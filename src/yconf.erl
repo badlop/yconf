@@ -951,7 +951,15 @@ read_include_files(Includes, Opts, Paths) ->
 		end, Y);
 	 (File) ->
 	      read_yaml(File, Opts, Paths)
-      end, Includes).
+      end, wildcard(Includes)).
+
+wildcard(Paths) when is_list(Paths) ->
+    lists:flatten([wildcard(Path) || Path <- Paths]);
+wildcard({Path, Opt}) ->
+    [{P, Opt} || P <- wildcard(Path)];
+wildcard(Path) when is_binary(Path) ->
+    Files = filelib:wildcard(binary_to_list(Path)),
+    [unicode:characters_to_binary(File) || File <- Files].
 
 %%%===================================================================
 %%% Auxiliary functions
